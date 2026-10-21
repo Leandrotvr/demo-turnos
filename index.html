@@ -55,12 +55,8 @@ details summary{cursor:pointer;padding:4px 0}
 .hidden{display:none!important}
 .mp{font-size:12px;color:var(--mut);text-align:center;margin:8px 0 0}
 .ok{text-align:center;padding:8px 0 4px}
-.check{width:56px;height:56px;border-radius:50%;background:var(--free);color:var(--brand);display:grid;place-items:center;font-size:30px;margin:0 auto 8px}
-.ticket{background:#f7faf9;border:2px dashed #b9d4cc;border-radius:14px;padding:4px 14px;margin:12px 0 6px;text-align:left}
-.t-row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px dashed var(--line);font-size:15px}
-.t-row:last-child{border:0}
-.t-row span{color:var(--mut)}
-.t-row b{text-align:right}
+.check{width:48px;height:48px;border-radius:50%;background:var(--free);color:var(--brand);display:grid;place-items:center;font-size:26px;margin:0 auto 6px}
+.ticketimg{display:block;width:100%;height:auto;border-radius:14px;margin:10px 0 4px}
 .hint{font-size:12.5px;color:var(--mut);margin:8px 0 0}
 .notif{background:#1f2d2a;color:#e9f1ee;border-radius:14px;padding:12px 14px;font-size:13.5px;margin-top:10px}
 .notif small{color:#93a9a2;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;font-size:11px}
@@ -133,15 +129,9 @@ details summary{cursor:pointer;padding:4px 0}
     <div class="card ok">
       <div class="check">✓</div>
       <h2>¡Listo! Este es tu turno</h2>
-      <div class="ticket">
-        <div class="t-row"><span>Cliente</span><b id="tNom"></b></div>
-        <div class="t-row"><span>Día</span><b id="tDia"></b></div>
-        <div class="t-row"><span>Hora</span><b id="tHora"></b></div>
-        <div class="t-row"><span>Lugar</span><b>Tu negocio</b></div>
-        <div class="t-row"><span>Estado</span><b style="color:var(--brand)">Pagado ✓</b></div>
-      </div>
-      <button class="btn wa" id="btnWa">Enviarme el turno por WhatsApp</button>
-      <button class="btn ghost" id="btnDl">Descargar turno</button>
+      <img id="ticketImg" class="ticketimg" alt="Tu turno confirmado">
+      <button class="btn wa" id="btnWa">Enviar por WhatsApp</button>
+      <button class="btn ghost" id="btnPdf">Descargar PDF</button>
       <button class="btn ghost" id="btnCal">Agregar al calendario</button>
       <p class="hint" id="mailNote"></p>
     </div>
@@ -168,9 +158,10 @@ details summary{cursor:pointer;padding:4px 0}
   var DN = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
   var MN = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
   var PRO = "Tu negocio";
+  var FONT = "system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif";
   var $ = function(id){return document.getElementById(id)};
   var state = {day:null, slot:null, left:HOLD_SECONDS, tick:null, fakeHold:null};
-  var booking = null;
+  var booking = null, ticketCanvas = null;
 
   // Días: próximos 5 hábiles
   var days = [], d = new Date();
@@ -184,7 +175,7 @@ details summary{cursor:pointer;padding:4px 0}
   function hash(s){var h=0;for(var i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))|0}return Math.abs(h)}
   function isBusy(di,h){return hash("x"+di+h)%100 < 38}
   function dayLabel(dt){return DN[dt.getDay()]+" "+dt.getDate()+" de "+MN[dt.getMonth()]}
-  function toast(t){var el=$("toast");el.textContent=t;el.classList.add("show");setTimeout(function(){el.classList.remove("show")},2600)}
+  function toast(t){var el=$("toast");el.textContent=t;el.classList.add("show");setTimeout(function(){el.classList.remove("show")},3200)}
 
   function setSteps(n){
     var is=$("steps").children;
@@ -246,7 +237,7 @@ details summary{cursor:pointer;padding:4px 0}
   $("again").onclick=release;
   $("simExpire").onclick=function(){state.left=3;paint()};
 
-  // ---- Tu turno: WhatsApp, descarga, calendario ----
+  // ---- Tu turno: imagen tipo boleto, WhatsApp, PDF, calendario ----
   function waNumber(raw){
     var n=raw.replace(/\D/g,"").replace(/^0+/,"");
     if(n.indexOf("54")===0) return n;
@@ -261,27 +252,94 @@ details summary{cursor:pointer;padding:4px 0}
     document.body.appendChild(a);a.click();a.remove();
     setTimeout(function(){URL.revokeObjectURL(a.href)},3000);
   }
-  function downloadTicket(){
-    var b=booking,c=document.createElement("canvas");
-    c.width=800;c.height=900;
-    var x=c.getContext("2d");
-    x.fillStyle="#f4f7f5";x.fillRect(0,0,800,900);
-    x.fillStyle="#2f7d6d";x.fillRect(0,0,800,150);
-    x.fillStyle="#ffffff";x.font="bold 46px system-ui,Arial,sans-serif";x.textAlign="center";
-    x.fillText("Turno confirmado ✓",400,92);
-    x.fillStyle="#ffffff";x.fillRect(60,200,680,520);
-    x.strokeStyle="#b9d4cc";x.lineWidth=3;x.setLineDash([12,8]);x.strokeRect(60,200,680,520);x.setLineDash([]);
-    var rows=[["Cliente",b.nom],["Día",b.dia],["Hora",b.hora+" hs"],["Lugar",PRO],["Estado","Pagado ✓"]];
-    rows.forEach(function(r,i){
-      var y=290+i*95;
-      x.textAlign="left";x.fillStyle="#6b7c77";x.font="30px system-ui,Arial,sans-serif";x.fillText(r[0],100,y);
-      x.textAlign="right";x.fillStyle="#1f2d2a";x.font="bold 34px system-ui,Arial,sans-serif";x.fillText(r[1],700,y);
-      if(i<rows.length-1){x.strokeStyle="#dfe7e3";x.lineWidth=2;x.beginPath();x.moveTo(100,y+32);x.lineTo(700,y+32);x.stroke()}
-    });
-    x.textAlign="center";x.fillStyle="#6b7c77";x.font="26px system-ui,Arial,sans-serif";
-    x.fillText("Demo · datos ficticios",400,800);
-    c.toBlob(function(bl){ if(bl) saveBlob(bl,"turno.png"); },"image/png");
+  function dataUrlBytes(u){
+    var bin=atob(u.split(",")[1]),a=new Uint8Array(bin.length);
+    for(var i=0;i<bin.length;i++) a[i]=bin.charCodeAt(i);
+    return a;
   }
+  function cut(s,n){return s.length>n ? s.slice(0,n-1)+"…" : s}
+
+  function renderTicket(b){
+    var W=1200,H=560,c=document.createElement("canvas");
+    c.width=W;c.height=H;
+    var x=c.getContext("2d");
+    var L=20,T=20,R=1180,B=540,SX=860,r=28,cx=(SX+R)/2;
+    x.fillStyle="#f4f7f5";x.fillRect(0,0,W,H);
+    function path(){
+      x.beginPath();x.moveTo(L+r,T);x.lineTo(R-r,T);x.arcTo(R,T,R,T+r,r);x.lineTo(R,B-r);
+      x.arcTo(R,B,R-r,B,r);x.lineTo(L+r,B);x.arcTo(L,B,L,B-r,r);x.lineTo(L,T+r);x.arcTo(L,T,L+r,T,r);x.closePath();
+    }
+    // cuerpo con sombra
+    x.save();x.shadowColor="rgba(31,45,42,.18)";x.shadowBlur=18;x.shadowOffsetY=6;
+    x.fillStyle="#ffffff";path();x.fill();x.restore();
+    // talón verde y franja superior
+    x.save();path();x.clip();
+    x.fillStyle="#2f7d6d";x.fillRect(SX,T,R-SX,B-T);
+    x.fillRect(L,T,SX-L,12);
+    x.restore();
+    // muescas y línea de corte
+    x.fillStyle="#f4f7f5";
+    x.beginPath();x.arc(SX,T,20,0,Math.PI*2);x.fill();
+    x.beginPath();x.arc(SX,B,20,0,Math.PI*2);x.fill();
+    x.save();x.setLineDash([10,10]);x.lineWidth=3;x.strokeStyle="rgba(255,255,255,.9)";
+    x.beginPath();x.moveTo(SX,T+34);x.lineTo(SX,B-34);x.stroke();x.restore();
+
+    // cuerpo principal
+    x.textAlign="left";
+    x.fillStyle="#2f7d6d";x.font="bold 22px "+FONT;x.fillText("TURNO CONFIRMADO",64,84);
+    x.fillStyle="#1f2d2a";x.font="bold 44px "+FONT;x.fillText(cut(PRO,24),64,140);
+    x.font="bold 132px "+FONT;x.fillText(b.hora,64,290);
+    var hw=x.measureText(b.hora).width;
+    x.font="bold 40px "+FONT;x.fillStyle="#6b7c77";x.fillText("hs",64+hw+14,290);
+    x.fillStyle="#245f53";x.font="bold 42px "+FONT;x.fillText(b.dia,64,346);
+    x.save();x.setLineDash([8,8]);x.lineWidth=2;x.strokeStyle="#c9d8d3";
+    x.beginPath();x.moveTo(64,388);x.lineTo(SX-48,388);x.stroke();x.restore();
+    x.fillStyle="#6b7c77";x.font="bold 20px "+FONT;
+    x.fillText("CLIENTE",64,432);x.fillText("ESTADO",520,432);
+    x.fillStyle="#1f2d2a";x.font="bold 38px "+FONT;x.fillText(cut(b.nom,16),64,478);
+    x.fillStyle="#2f7d6d";x.fillText("Pagado ✓",520,478);
+    x.fillStyle="#9aa8a3";x.font="18px "+FONT;x.fillText("Demo · datos ficticios",64,518);
+
+    // talón
+    x.textAlign="center";x.fillStyle="#ffffff";
+    x.font="bold 20px "+FONT;x.fillText("N° DE TURNO",cx,84);
+    x.font="bold 58px "+FONT;x.fillText(String(b.num),cx,152);
+    var bx=SX+50,bw=R-SX-100,by=196,bh=214,px=bx,seed=b.num;
+    while(px<bx+bw-6){
+      seed=(seed*1664525+1013904223)>>>0;
+      var w=2+((seed>>>16)%4);
+      seed=(seed*1664525+1013904223)>>>0;
+      var g=2+((seed>>>16)%3);
+      x.fillRect(px,by,w,bh);px+=w+g;
+    }
+    x.font="bold 30px "+FONT;x.fillText("Pagado ✓",cx,470);
+    return c;
+  }
+
+  /*PDF-START*/
+  function pdfFromJpeg(jpg,iw,ih){
+    var PW=595,PH=842,mw=535,mh=mw*ih/iw,px=30,py=PH-50-mh;
+    var parts=[],len=0,offs=[],enc=new TextEncoder();
+    function add(u8){parts.push(u8);len+=u8.length}
+    function addStr(s){add(enc.encode(s))}
+    addStr("%PDF-1.4\n");
+    offs[1]=len;addStr("1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
+    offs[2]=len;addStr("2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n");
+    offs[3]=len;addStr("3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 "+PW+" "+PH+"] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>\nendobj\n");
+    offs[4]=len;addStr("4 0 obj\n<< /Type /XObject /Subtype /Image /Width "+iw+" /Height "+ih+" /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length "+jpg.length+" >>\nstream\n");
+    add(jpg);addStr("\nendstream\nendobj\n");
+    var content="q "+mw+" 0 0 "+mh.toFixed(2)+" "+px+" "+py.toFixed(2)+" cm /Im0 Do Q";
+    offs[5]=len;addStr("5 0 obj\n<< /Length "+content.length+" >>\nstream\n"+content+"\nendstream\nendobj\n");
+    var xref=len,s="xref\n0 6\n0000000000 65535 f \n";
+    for(var i=1;i<=5;i++){s+=("0000000000"+offs[i]).slice(-10)+" 00000 n \n"}
+    s+="trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n"+xref+"\n%%EOF";
+    addStr(s);
+    var out=new Uint8Array(len),p=0;
+    parts.forEach(function(a){out.set(a,p);p+=a.length});
+    return out;
+  }
+  /*PDF-END*/
+
   function downloadIcs(){
     var b=booking,p=b.hora.split(":");
     var s=new Date(b.date.getFullYear(),b.date.getMonth(),b.date.getDate(),+p[0],+p[1]);
@@ -293,13 +351,25 @@ details summary{cursor:pointer;padding:4px 0}
       "SUMMARY:Turno en "+PRO,"END:VEVENT","END:VCALENDAR"].join("\r\n");
     saveBlob(new Blob([ics],{type:"text/calendar;charset=utf-8"}),"turno.ics");
   }
+
   $("btnWa").onclick=function(){
-    if(!booking) return;
-    var url="https://wa.me/"+waNumber(booking.tel)+"?text="+encodeURIComponent(ticketText(booking));
-    var w=window.open(url,"_blank");
-    if(!w){window.location.href=url}
+    if(!booking||!ticketCanvas) return;
+    var blob=new Blob([dataUrlBytes(ticketCanvas.toDataURL("image/png"))],{type:"image/png"});
+    var file=new File([blob],"turno.png",{type:"image/png"});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      navigator.share({files:[file],text:ticketText(booking)}).catch(function(){});
+    } else {
+      // Sin menú de compartir (por ejemplo en computadora): guarda la imagen y abre el chat
+      saveBlob(blob,"turno.png");
+      toast("Imagen guardada: adjuntala en el chat de WhatsApp");
+      window.open("https://wa.me/"+waNumber(booking.tel)+"?text="+encodeURIComponent(ticketText(booking)),"_blank");
+    }
   };
-  $("btnDl").onclick=function(){ if(booking) downloadTicket() };
+  $("btnPdf").onclick=function(){
+    if(!booking||!ticketCanvas) return;
+    var jpg=dataUrlBytes(ticketCanvas.toDataURL("image/jpeg",0.92));
+    saveBlob(new Blob([pdfFromJpeg(jpg,ticketCanvas.width,ticketCanvas.height)],{type:"application/pdf"}),"turno.pdf");
+  };
   $("btnCal").onclick=function(){ if(booking) downloadIcs() };
 
   $("doPay").onclick=function(){
@@ -309,9 +379,10 @@ details summary{cursor:pointer;padding:4px 0}
       var nom=$("nom").value.trim();
       var mail=$("mail").value.trim();
       booking={nom:nom,tel:$("tel").value,mail:mail,date:days[state.day],hora:state.slot,dia:dayLabel(days[state.day])};
-      $("tNom").textContent=nom;
-      $("tDia").textContent=booking.dia;
-      $("tHora").textContent=booking.hora+" hs";
+      booking.num=100000+hash("n"+nom+booking.dia+booking.hora)%900000;
+      ticketCanvas=renderTicket(booking);
+      $("ticketImg").src=ticketCanvas.toDataURL("image/png");
+      $("ticketImg").alt="Turno confirmado: "+booking.dia+", "+booking.hora+" hs, a nombre de "+nom;
       $("mailNote").textContent = mail ? "También te llegó el turno por mail a "+mail+"." : "";
       $("notifTxt").innerHTML="<b>"+nom.replace(/</g,"&lt;")+"</b> reservó y pagó la seña.<br>"+booking.dia+", "+booking.hora+" hs · $ 12.000 acreditados. Horario bloqueado en la agenda.";
       setSteps(3); show("s4");
@@ -320,7 +391,7 @@ details summary{cursor:pointer;padding:4px 0}
 
   $("restart").onclick=function(){
     $("nom").value="";$("tel").value="";$("mail").value="";$("priv").checked=false;
-    booking=null;state.slot=null;setSteps(1);show("s1");renderGrid();
+    booking=null;ticketCanvas=null;state.slot=null;setSteps(1);show("s1");renderGrid();
   };
 
   // Simula que otra persona está pagando un horario (para mostrar la actualización en vivo)
