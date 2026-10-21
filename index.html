@@ -82,10 +82,10 @@ input:focus{outline:2px solid var(--brand);border-color:transparent}
 <div class="demo-bar"><b>DEMO</b> · Datos ficticios · Nada de lo que veas acá es real</div>
 <div class="wrap">
   <header>
-    <div class="avatar">MG</div>
+    <div class="avatar">TC</div>
     <div>
-      <h1>Consultorio de Psicología</h1>
-      <p>Lic. María Paula Gatti · Sesión online o presencial</p>
+      <h1>Tu consultorio</h1>
+      <p>Reservá tu turno online</p>
     </div>
   </header>
 
@@ -154,7 +154,7 @@ input:focus{outline:2px solid var(--brand);border-color:transparent}
         <div class="t-row"><span>Paciente</span><b id="tNom"></b></div>
         <div class="t-row"><span>Día</span><b id="tDia"></b></div>
         <div class="t-row"><span>Hora</span><b id="tHora"></b></div>
-        <div class="t-row"><span>Profesional</span><b>Lic. María Paula Gatti</b></div>
+        <div class="t-row"><span>Lugar</span><b>Tu consultorio</b></div>
         <div class="t-row"><span>Estado</span><b style="color:var(--brand)">Pagado ✓</b></div>
       </div>
       <p class="hint">Podés sacarle una captura a esta pantalla.</p>
@@ -164,7 +164,7 @@ input:focus{outline:2px solid var(--brand);border-color:transparent}
       <p class="hint" id="mailNote"></p>
     </div>
     <div class="card">
-      <h2>Lo que recibe la profesional</h2>
+      <h2>Lo que recibe el consultorio</h2>
       <p class="sub">Al mismo instante, sin que el paciente tenga que hacer nada.</p>
       <div class="notif"><small>Mail · Turno nuevo</small><span id="notifTxt"></span></div>
       <div class="notif"><small>Google Calendar</small>Evento creado en la agenda y horario bloqueado para otros.</div>
@@ -192,7 +192,7 @@ input:focus{outline:2px solid var(--brand);border-color:transparent}
   var HOURS = ["09:00","10:00","11:00","12:00","15:00","16:00","17:00","18:00","19:00"];
   var DN = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
   var MN = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
-  var PRO = "Lic. María Paula Gatti";
+  var PRO = "Tu consultorio";
   var $ = function(id){return document.getElementById(id)};
   var state = {day:null, slot:null, left:HOLD_SECONDS, timer:null, tick:null, phase:1, fakeHold:null};
   var booking = null;
@@ -314,7 +314,7 @@ input:focus{outline:2px solid var(--brand);border-color:transparent}
     x.fillText("Turno confirmado ✓",400,92);
     x.fillStyle="#ffffff";x.fillRect(60,200,680,520);
     x.strokeStyle="#b9d4cc";x.lineWidth=3;x.setLineDash([12,8]);x.strokeRect(60,200,680,520);x.setLineDash([]);
-    var rows=[["Paciente",b.nom],["Día",b.dia],["Hora",b.hora+" hs"],["Profesional",PRO],["Estado","Pagado ✓"]];
+    var rows=[["Paciente",b.nom],["Día",b.dia],["Hora",b.hora+" hs"],["Lugar",PRO],["Estado","Pagado ✓"]];
     rows.forEach(function(r,i){
       var y=290+i*95;
       x.textAlign="left";x.fillStyle="#6b7c77";x.font="30px system-ui,Arial,sans-serif";x.fillText(r[0],100,y);
@@ -333,7 +333,7 @@ input:focus{outline:2px solid var(--brand);border-color:transparent}
     var stamp=new Date().toISOString().replace(/[-:]/g,"").split(".")[0]+"Z";
     var ics=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Demo turnos//ES","BEGIN:VEVENT",
       "UID:"+Date.now()+"@demo-turnos","DTSTAMP:"+stamp,"DTSTART:"+f(s),"DTEND:"+f(e),
-      "SUMMARY:Sesión con "+PRO,"END:VEVENT","END:VCALENDAR"].join("\r\n");
+      "SUMMARY:Turno en "+PRO,"END:VEVENT","END:VCALENDAR"].join("\r\n");
     saveBlob(new Blob([ics],{type:"text/calendar;charset=utf-8"}),"turno.ics");
   }
   $("btnWa").onclick=function(){
