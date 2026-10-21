@@ -41,8 +41,9 @@ h2{font-size:17px;margin:0 0 4px}
 .sum{display:flex;justify-content:space-between;font-size:14px;padding:6px 0;border-bottom:1px dashed var(--line)}
 .sum:last-child{border:0}
 label{display:block;font-size:13px;color:var(--mut);margin:12px 0 4px}
-input[type=text],input[type=tel]{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;font-size:16px;background:#fff}
+input[type=text],input[type=tel],input[type=email]{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;font-size:16px;background:#fff}
 input:focus{outline:2px solid var(--brand);border-color:transparent}
+.opt{opacity:.75}
 .hp{position:absolute;left:-9999px}
 .chk{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:var(--mut);margin-top:12px}
 .chk input{margin-top:3px}
@@ -50,6 +51,7 @@ input:focus{outline:2px solid var(--brand);border-color:transparent}
 .btn:disabled{background:#b9c9c4;cursor:not-allowed}
 .btn.ghost{background:transparent;color:var(--brand-d);border:1px solid var(--line);margin-top:8px;font-weight:600}
 .btn.pay{background:#0a7cff}
+.btn.wa{background:#1fa855;margin-top:12px}
 .hidden{display:none!important}
 .pay-opt{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer;font-size:15px}
 .pay-opt.sel{border-color:#0a7cff;background:#eef5ff}
@@ -59,6 +61,12 @@ input:focus{outline:2px solid var(--brand);border-color:transparent}
 .sim{font-size:12px;color:var(--mut);background:#f0f3f2;border-radius:8px;padding:8px 10px;margin-bottom:12px}
 .ok{text-align:center;padding:8px 0 4px}
 .check{width:64px;height:64px;border-radius:50%;background:var(--free);color:var(--brand);display:grid;place-items:center;font-size:34px;margin:0 auto 10px}
+.ticket{background:#f7faf9;border:2px dashed #b9d4cc;border-radius:14px;padding:6px 14px;margin:12px 0 6px;text-align:left}
+.t-row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px dashed var(--line);font-size:15px}
+.t-row:last-child{border:0}
+.t-row span{color:var(--mut)}
+.t-row b{text-align:right}
+.hint{font-size:12.5px;color:var(--mut);margin:8px 0 0}
 .notif{background:#1f2d2a;color:#e9f1ee;border-radius:14px;padding:12px 14px;font-size:13.5px;margin-top:10px}
 .notif small{color:#93a9a2;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;font-size:11px}
 .spin{width:34px;height:34px;border:4px solid var(--line);border-top-color:#0a7cff;border-radius:50%;animation:r 0.8s linear infinite;margin:20px auto}
@@ -109,7 +117,9 @@ input:focus{outline:2px solid var(--brand);border-color:transparent}
       <label for="nom">Nombre</label>
       <input type="text" id="nom" placeholder="Ej: Ana" autocomplete="off">
       <label for="tel">WhatsApp</label>
-      <input type="tel" id="tel" placeholder="Ej: 379 4 123456" autocomplete="off">
+      <input type="tel" id="tel" placeholder="Ej: 3794 123456 (sin 0 ni 15)" autocomplete="off">
+      <label for="mail" class="opt">Email (opcional)</label>
+      <input type="email" id="mail" placeholder="Si querés recibir también el turno por mail" autocomplete="off">
       <input type="text" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
       <label class="chk"><input type="checkbox" id="priv"><span>Acepto el aviso de privacidad. No se solicitan datos clínicos en este formulario.</span></label>
       <button class="btn" id="goPay" disabled>Continuar al pago</button>
@@ -139,13 +149,23 @@ input:focus{outline:2px solid var(--brand);border-color:transparent}
     <div class="card ok">
       <div class="check">✓</div>
       <h2>¡Turno confirmado!</h2>
-      <p class="sub" id="doneTxt"></p>
-      <div class="sum"><span>Estado</span><b style="color:var(--brand)">Pagado</b></div>
-      <div class="sum"><span>Recordatorio</span><b>24 hs antes, por mail</b></div>
+      <p class="sub">Ya está reservado y pagado. Guardalo como te quede más cómodo.</p>
+      <div class="ticket">
+        <div class="t-row"><span>Paciente</span><b id="tNom"></b></div>
+        <div class="t-row"><span>Día</span><b id="tDia"></b></div>
+        <div class="t-row"><span>Hora</span><b id="tHora"></b></div>
+        <div class="t-row"><span>Profesional</span><b>Lic. María Paula Gatti</b></div>
+        <div class="t-row"><span>Estado</span><b style="color:var(--brand)">Pagado ✓</b></div>
+      </div>
+      <p class="hint">Podés sacarle una captura a esta pantalla.</p>
+      <button class="btn wa" id="btnWa">Enviarme el turno por WhatsApp</button>
+      <button class="btn ghost" id="btnDl">Descargar turno</button>
+      <button class="btn ghost" id="btnCal">Agregar al calendario</button>
+      <p class="hint" id="mailNote"></p>
     </div>
     <div class="card">
       <h2>Lo que recibe la profesional</h2>
-      <p class="sub">Al mismo instante, sin que nadie tenga que escribir ni verificar nada.</p>
+      <p class="sub">Al mismo instante, sin que el paciente tenga que hacer nada.</p>
       <div class="notif"><small>Mail · Turno nuevo</small><span id="notifTxt"></span></div>
       <div class="notif"><small>Google Calendar</small>Evento creado en la agenda y horario bloqueado para otros.</div>
     </div>
@@ -172,8 +192,10 @@ input:focus{outline:2px solid var(--brand);border-color:transparent}
   var HOURS = ["09:00","10:00","11:00","12:00","15:00","16:00","17:00","18:00","19:00"];
   var DN = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
   var MN = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+  var PRO = "Lic. María Paula Gatti";
   var $ = function(id){return document.getElementById(id)};
   var state = {day:null, slot:null, left:HOLD_SECONDS, timer:null, tick:null, phase:1, fakeHold:null};
+  var booking = null;
 
   // Días: próximos 5 hábiles
   var days = [], d = new Date();
@@ -183,6 +205,7 @@ input:focus{outline:2px solid var(--brand);border-color:transparent}
   }
   state.day = 0;
 
+  function pad(n){return (n<10?"0":"")+n}
   function hash(s){var h=0;for(var i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))|0}return Math.abs(h)}
   function isBusy(di,h){return hash("x"+di+h)%100 < 38}
   function dayLabel(dt){return DN[dt.getDay()]+" "+dt.getDate()+" de "+MN[dt.getMonth()]}
@@ -266,22 +289,82 @@ input:focus{outline:2px solid var(--brand);border-color:transparent}
     };
   });
 
+  // ---- Confirmación: WhatsApp, descarga, calendario ----
+  function waNumber(raw){
+    var n=raw.replace(/\D/g,"").replace(/^0+/,"");
+    if(n.indexOf("54")===0) return n;
+    return "549"+n;
+  }
+  function ticketText(b){
+    return "Turno confirmado ✓\n"+PRO+"\n"+b.dia+" · "+b.hora+" hs\nPaciente: "+b.nom+"\nEstado: Pagado";
+  }
+  function saveBlob(blob,name){
+    var a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);a.download=name;
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(function(){URL.revokeObjectURL(a.href)},3000);
+  }
+  function downloadTicket(){
+    var b=booking,c=document.createElement("canvas");
+    c.width=800;c.height=900;
+    var x=c.getContext("2d");
+    x.fillStyle="#f4f7f5";x.fillRect(0,0,800,900);
+    x.fillStyle="#2f7d6d";x.fillRect(0,0,800,150);
+    x.fillStyle="#ffffff";x.font="bold 46px system-ui,Arial,sans-serif";x.textAlign="center";
+    x.fillText("Turno confirmado ✓",400,92);
+    x.fillStyle="#ffffff";x.fillRect(60,200,680,520);
+    x.strokeStyle="#b9d4cc";x.lineWidth=3;x.setLineDash([12,8]);x.strokeRect(60,200,680,520);x.setLineDash([]);
+    var rows=[["Paciente",b.nom],["Día",b.dia],["Hora",b.hora+" hs"],["Profesional",PRO],["Estado","Pagado ✓"]];
+    rows.forEach(function(r,i){
+      var y=290+i*95;
+      x.textAlign="left";x.fillStyle="#6b7c77";x.font="30px system-ui,Arial,sans-serif";x.fillText(r[0],100,y);
+      x.textAlign="right";x.fillStyle="#1f2d2a";x.font="bold 34px system-ui,Arial,sans-serif";x.fillText(r[1],700,y);
+      if(i<rows.length-1){x.strokeStyle="#dfe7e3";x.lineWidth=2;x.beginPath();x.moveTo(100,y+32);x.lineTo(700,y+32);x.stroke()}
+    });
+    x.textAlign="center";x.fillStyle="#6b7c77";x.font="26px system-ui,Arial,sans-serif";
+    x.fillText("Demo · datos ficticios",400,800);
+    c.toBlob(function(bl){ if(bl) saveBlob(bl,"turno.png"); },"image/png");
+  }
+  function downloadIcs(){
+    var b=booking,p=b.hora.split(":");
+    var s=new Date(b.date.getFullYear(),b.date.getMonth(),b.date.getDate(),+p[0],+p[1]);
+    var e=new Date(s.getTime()+50*60000);
+    function f(t){return t.getFullYear()+pad(t.getMonth()+1)+pad(t.getDate())+"T"+pad(t.getHours())+pad(t.getMinutes())+"00"}
+    var stamp=new Date().toISOString().replace(/[-:]/g,"").split(".")[0]+"Z";
+    var ics=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Demo turnos//ES","BEGIN:VEVENT",
+      "UID:"+Date.now()+"@demo-turnos","DTSTAMP:"+stamp,"DTSTART:"+f(s),"DTEND:"+f(e),
+      "SUMMARY:Sesión con "+PRO,"END:VEVENT","END:VCALENDAR"].join("\r\n");
+    saveBlob(new Blob([ics],{type:"text/calendar;charset=utf-8"}),"turno.ics");
+  }
+  $("btnWa").onclick=function(){
+    if(!booking) return;
+    var url="https://wa.me/"+waNumber(booking.tel)+"?text="+encodeURIComponent(ticketText(booking));
+    var w=window.open(url,"_blank");
+    if(!w){window.location.href=url}
+  };
+  $("btnDl").onclick=function(){ if(booking) downloadTicket() };
+  $("btnCal").onclick=function(){ if(booking) downloadIcs() };
+
   $("doPay").onclick=function(){
     $("payBox").classList.add("hidden"); $("procBox").classList.remove("hidden");
     stopClock();
     setTimeout(function(){
       var nom=$("nom").value.trim();
-      var when=dayLabel(days[state.day])+", "+state.slot+" hs";
-      $("doneTxt").textContent=nom+", tu turno es el "+when+". Te llegó la confirmación por mail.";
-      $("notifTxt").innerHTML="<b>"+nom.replace(/</g,"&lt;")+"</b> reservó y pagó la seña.<br>"+when+" · $ 12.000 acreditados.";
+      var mail=$("mail").value.trim();
+      booking={nom:nom,tel:$("tel").value,mail:mail,date:days[state.day],hora:state.slot,dia:dayLabel(days[state.day])};
+      $("tNom").textContent=nom;
+      $("tDia").textContent=booking.dia;
+      $("tHora").textContent=booking.hora+" hs";
+      $("mailNote").textContent = mail ? "También te llegó el turno por mail a "+mail+"." : "";
+      $("notifTxt").innerHTML="<b>"+nom.replace(/</g,"&lt;")+"</b> reservó y pagó la seña.<br>"+booking.dia+", "+booking.hora+" hs · $ 12.000 acreditados.";
       setSteps(4); show("s4");
     },1800);
   };
 
   $("restart").onclick=function(){
-    $("nom").value="";$("tel").value="";$("priv").checked=false;validate();
+    $("nom").value="";$("tel").value="";$("mail").value="";$("priv").checked=false;validate();
     $("payBox").classList.remove("hidden");$("procBox").classList.add("hidden");
-    state.slot=null;setSteps(1);show("s1");renderGrid();
+    booking=null;state.slot=null;setSteps(1);show("s1");renderGrid();
   };
 
   // Simula que otra persona está pagando un horario (para mostrar la actualización en vivo)
