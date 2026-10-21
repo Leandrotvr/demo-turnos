@@ -257,6 +257,8 @@ details summary{cursor:pointer;padding:4px 0}
     for(var i=0;i<bin.length;i++) a[i]=bin.charCodeAt(i);
     return a;
   }
+  function slug(s){return s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")}
+  function fname(b,ext){return "turno-"+slug(PRO)+"-"+slug(b.dia)+"-"+b.hora.replace(":","")+"."+ext}
   function cut(s,n){return s.length>n ? s.slice(0,n-1)+"…" : s}
 
   function renderTicket(b){
@@ -355,12 +357,12 @@ details summary{cursor:pointer;padding:4px 0}
   $("btnWa").onclick=function(){
     if(!booking||!ticketCanvas) return;
     var blob=new Blob([dataUrlBytes(ticketCanvas.toDataURL("image/png"))],{type:"image/png"});
-    var file=new File([blob],"turno.png",{type:"image/png"});
+    var file=new File([blob],fname(booking,"png"),{type:"image/png"});
     if(navigator.canShare && navigator.canShare({files:[file]})){
       navigator.share({files:[file],text:ticketText(booking)}).catch(function(){});
     } else {
       // Sin menú de compartir (por ejemplo en computadora): guarda la imagen y abre el chat
-      saveBlob(blob,"turno.png");
+      saveBlob(blob,fname(booking,"png"));
       toast("Imagen guardada: adjuntala en el chat de WhatsApp");
       window.open("https://wa.me/"+waNumber(booking.tel)+"?text="+encodeURIComponent(ticketText(booking)),"_blank");
     }
@@ -368,7 +370,7 @@ details summary{cursor:pointer;padding:4px 0}
   $("btnPdf").onclick=function(){
     if(!booking||!ticketCanvas) return;
     var jpg=dataUrlBytes(ticketCanvas.toDataURL("image/jpeg",0.92));
-    saveBlob(new Blob([pdfFromJpeg(jpg,ticketCanvas.width,ticketCanvas.height)],{type:"application/pdf"}),"turno.pdf");
+    saveBlob(new Blob([pdfFromJpeg(jpg,ticketCanvas.width,ticketCanvas.height)],{type:"application/pdf"}),fname(booking,"pdf"));
   };
   $("btnCal").onclick=function(){ if(booking) downloadIcs() };
 
