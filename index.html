@@ -21,10 +21,9 @@ header h1{font-size:18px;margin:0}
 header p{margin:0;color:var(--mut);font-size:13px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
 .steps{display:flex;gap:6px;margin-bottom:14px}
-.steps i{flex:1;height:4px;border-radius:4px;background:var(--line)}
-.steps i.on{background:var(--brand)}
-h2{font-size:17px;margin:0 0 4px}
-.sub{color:var(--mut);font-size:14px;margin:0 0 12px}
+.steps div{flex:1;font-size:12px;color:var(--mut);border-top:4px solid var(--line);padding-top:6px;text-align:center}
+.steps div.on{border-top-color:var(--brand);color:var(--brand-d);font-weight:700}
+h2{font-size:17px;margin:0 0 10px}
 .days{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px}
 .day{flex:none;border:1px solid var(--line);background:#fff;border-radius:12px;padding:8px 12px;text-align:center;font-size:13px;cursor:pointer;min-width:62px}
 .day b{display:block;font-size:17px}
@@ -36,14 +35,15 @@ h2{font-size:17px;margin:0 0 4px}
 .slot.hold{background:var(--hold);color:#8a6d00;cursor:not-allowed;font-weight:500;font-size:12px}
 .legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--mut);margin-top:12px}
 .legend span:before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px;background:var(--c)}
-.timer{display:flex;align-items:center;justify-content:space-between;background:#fff8e6;border:1px solid #f3dfa0;border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:14px}
-.timer b{font-size:22px;font-variant-numeric:tabular-nums;color:var(--warn)}
-.sum{display:flex;justify-content:space-between;font-size:14px;padding:6px 0;border-bottom:1px dashed var(--line)}
-.sum:last-child{border:0}
+.timer{display:flex;align-items:center;justify-content:space-between;background:#fff8e6;border:1px solid #f3dfa0;border-radius:12px;padding:8px 14px;margin-bottom:12px;font-size:14px}
+.timer b{font-size:20px;font-variant-numeric:tabular-nums;color:var(--warn)}
+.sum{display:flex;justify-content:space-between;font-size:15px;padding:8px 0;border-bottom:1px dashed var(--line)}
+.sum:last-of-type{border:0}
 label{display:block;font-size:13px;color:var(--mut);margin:12px 0 4px}
 input[type=text],input[type=tel],input[type=email]{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;font-size:16px;background:#fff}
 input:focus{outline:2px solid var(--brand);border-color:transparent}
-.opt{opacity:.75}
+details{margin-top:10px;font-size:13px;color:var(--mut)}
+details summary{cursor:pointer;padding:4px 0}
 .hp{position:absolute;left:-9999px}
 .chk{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:var(--mut);margin-top:12px}
 .chk input{margin-top:3px}
@@ -53,15 +53,10 @@ input:focus{outline:2px solid var(--brand);border-color:transparent}
 .btn.pay{background:#0a7cff}
 .btn.wa{background:#1fa855;margin-top:12px}
 .hidden{display:none!important}
-.pay-opt{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer;font-size:15px}
-.pay-opt.sel{border-color:#0a7cff;background:#eef5ff}
-.pay-opt small{display:block;color:var(--mut);font-size:12px}
-.dot{width:18px;height:18px;border-radius:50%;border:2px solid #c3cfcb;flex:none}
-.pay-opt.sel .dot{border-color:#0a7cff;background:radial-gradient(#0a7cff 45%,transparent 50%)}
-.sim{font-size:12px;color:var(--mut);background:#f0f3f2;border-radius:8px;padding:8px 10px;margin-bottom:12px}
+.mp{font-size:12px;color:var(--mut);text-align:center;margin:8px 0 0}
 .ok{text-align:center;padding:8px 0 4px}
-.check{width:64px;height:64px;border-radius:50%;background:var(--free);color:var(--brand);display:grid;place-items:center;font-size:34px;margin:0 auto 10px}
-.ticket{background:#f7faf9;border:2px dashed #b9d4cc;border-radius:14px;padding:6px 14px;margin:12px 0 6px;text-align:left}
+.check{width:56px;height:56px;border-radius:50%;background:var(--free);color:var(--brand);display:grid;place-items:center;font-size:30px;margin:0 auto 8px}
+.ticket{background:#f7faf9;border:2px dashed #b9d4cc;border-radius:14px;padding:4px 14px;margin:12px 0 6px;text-align:left}
 .t-row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px dashed var(--line);font-size:15px}
 .t-row:last-child{border:0}
 .t-row span{color:var(--mut)}
@@ -73,7 +68,6 @@ input:focus{outline:2px solid var(--brand);border-color:transparent}
 @keyframes r{to{transform:rotate(360deg)}}
 .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#1f2d2a;color:#fff;padding:10px 16px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .25s;max-width:90%;text-align:center}
 .toast.show{opacity:1}
-.foot{text-align:center;font-size:12px;color:var(--mut);margin-top:18px}
 .tools{margin-top:10px;text-align:center}
 .tools button{background:none;border:0;color:var(--mut);font-size:12px;text-decoration:underline;cursor:pointer;padding:6px}
 </style>
@@ -82,20 +76,19 @@ input:focus{outline:2px solid var(--brand);border-color:transparent}
 <div class="demo-bar"><b>DEMO</b> · Datos ficticios · Nada de lo que veas acá es real</div>
 <div class="wrap">
   <header>
-    <div class="avatar">TC</div>
+    <div class="avatar">TN</div>
     <div>
-      <h1>Tu consultorio</h1>
-      <p>Reservá tu turno online</p>
+      <h1>Tu negocio</h1>
+      <p>Elegí día y horario, pagá y recibí tu turno</p>
     </div>
   </header>
 
-  <div class="steps" id="steps"><i></i><i></i><i></i><i></i></div>
+  <div class="steps" id="steps"><div>1 · Elegí</div><div>2 · Pagá</div><div>3 · Recibí</div></div>
 
-  <!-- 1. Horarios -->
+  <!-- 1. Día y horario -->
   <section id="s1">
     <div class="card">
-      <h2>Elegí tu horario</h2>
-      <p class="sub">Los horarios se actualizan en tiempo real.</p>
+      <h2>Elegí día y horario</h2>
       <div class="days" id="days"></div>
       <div class="grid" id="grid"></div>
       <div class="legend">
@@ -106,69 +99,53 @@ input:focus{outline:2px solid var(--brand);border-color:transparent}
     </div>
   </section>
 
-  <!-- 2. Reserva + datos -->
+  <!-- 2. Pago -->
   <section id="s2" class="hidden">
-    <div class="timer"><span>Horario reservado para vos</span><b id="clock">10:00</b></div>
+    <div class="timer"><span>Tu horario está reservado</span><b id="clock">10:00</b></div>
     <div class="card">
-      <h2>Tus datos</h2>
-      <p class="sub">Solo pedimos lo mínimo para coordinar.</p>
+      <h2>Pagá para confirmar</h2>
       <div class="sum"><span>Turno</span><b id="sumSlot"></b></div>
-      <div class="sum"><span>Seña para confirmar</span><b>$ 12.000</b></div>
+      <div class="sum"><span>Seña</span><b>$ 12.000</b></div>
       <label for="nom">Nombre</label>
       <input type="text" id="nom" placeholder="Ej: Ana" autocomplete="off">
       <label for="tel">WhatsApp</label>
       <input type="tel" id="tel" placeholder="Ej: 3794 123456 (sin 0 ni 15)" autocomplete="off">
-      <label for="mail" class="opt">Email (opcional)</label>
-      <input type="email" id="mail" placeholder="Si querés recibir también el turno por mail" autocomplete="off">
+      <details>
+        <summary>Agregar email (opcional)</summary>
+        <input type="email" id="mail" placeholder="Para recibir también el turno por mail" autocomplete="off">
+      </details>
       <input type="text" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
-      <label class="chk"><input type="checkbox" id="priv"><span>Acepto el aviso de privacidad. No se solicitan datos clínicos en este formulario.</span></label>
-      <button class="btn" id="goPay" disabled>Continuar al pago</button>
+      <label class="chk"><input type="checkbox" id="priv"><span>Acepto el aviso de privacidad.</span></label>
+      <button class="btn pay" id="doPay" disabled>Pagar $ 12.000</button>
+      <p class="mp">Billetera virtual o tarjeta · Mercado Pago (simulado)</p>
       <button class="btn ghost" id="cancelHold">Elegir otro horario</button>
     </div>
     <div class="tools"><button id="simExpire">Demo: simular que se agota el tiempo</button></div>
   </section>
 
-  <!-- 3. Pago simulado -->
+  <!-- Procesando -->
   <section id="s3" class="hidden">
-    <div class="timer"><span>Tiempo restante</span><b id="clock2">10:00</b></div>
-    <div class="card" id="payBox">
-      <h2>Pagá la seña</h2>
-      <p class="sub">Acá se abre el checkout de Mercado Pago, con billetera virtual o tarjeta.</p>
-      <div class="sim">Pantalla simulada para la demo. No se cobra nada.</div>
-      <div class="pay-opt sel" data-o="0"><span class="dot"></span><div>Dinero en cuenta<small>Billetera virtual</small></div></div>
-      <div class="pay-opt" data-o="1"><span class="dot"></span><div>Tarjeta de crédito o débito<small>Hasta 3 cuotas</small></div></div>
-      <div class="pay-opt" data-o="2"><span class="dot"></span><div>Transferencia<small>Desde cualquier banco</small></div></div>
-      <div class="sum" style="margin-top:8px"><span>Total</span><b>$ 12.000</b></div>
-      <button class="btn pay" id="doPay">Pagar $ 12.000</button>
-    </div>
-    <div class="card hidden" id="procBox"><div class="spin"></div><p class="sub" style="text-align:center">Confirmando el pago…</p></div>
+    <div class="card"><div class="spin"></div><p class="hint" style="text-align:center">Confirmando el pago…</p></div>
   </section>
 
-  <!-- 4. Confirmado -->
+  <!-- 3. Tu turno -->
   <section id="s4" class="hidden">
     <div class="card ok">
       <div class="check">✓</div>
-      <h2>¡Turno confirmado!</h2>
-      <p class="sub">Ya está reservado y pagado. Guardalo como te quede más cómodo.</p>
+      <h2>¡Listo! Este es tu turno</h2>
       <div class="ticket">
-        <div class="t-row"><span>Paciente</span><b id="tNom"></b></div>
+        <div class="t-row"><span>Cliente</span><b id="tNom"></b></div>
         <div class="t-row"><span>Día</span><b id="tDia"></b></div>
         <div class="t-row"><span>Hora</span><b id="tHora"></b></div>
-        <div class="t-row"><span>Lugar</span><b>Tu consultorio</b></div>
+        <div class="t-row"><span>Lugar</span><b>Tu negocio</b></div>
         <div class="t-row"><span>Estado</span><b style="color:var(--brand)">Pagado ✓</b></div>
       </div>
-      <p class="hint">Podés sacarle una captura a esta pantalla.</p>
       <button class="btn wa" id="btnWa">Enviarme el turno por WhatsApp</button>
       <button class="btn ghost" id="btnDl">Descargar turno</button>
       <button class="btn ghost" id="btnCal">Agregar al calendario</button>
       <p class="hint" id="mailNote"></p>
     </div>
-    <div class="card">
-      <h2>Lo que recibe el consultorio</h2>
-      <p class="sub">Al mismo instante, sin que el paciente tenga que hacer nada.</p>
-      <div class="notif"><small>Mail · Turno nuevo</small><span id="notifTxt"></span></div>
-      <div class="notif"><small>Google Calendar</small>Evento creado en la agenda y horario bloqueado para otros.</div>
-    </div>
+    <div class="notif"><small>Aviso al negocio, al instante</small><span id="notifTxt"></span></div>
     <button class="btn ghost" id="restart">Volver a probar la demo</button>
   </section>
 
@@ -177,12 +154,10 @@ input:focus{outline:2px solid var(--brand);border-color:transparent}
     <div class="card ok">
       <div class="check" style="background:#fdeede;color:var(--warn)">⏱</div>
       <h2>Se agotó el tiempo</h2>
-      <p class="sub">La reserva venció y el horario volvió a quedar libre para otras personas. Podés elegir de nuevo.</p>
+      <p class="hint" style="margin-bottom:6px">El horario volvió a quedar libre. Podés elegir de nuevo.</p>
       <button class="btn" id="again">Elegir un horario</button>
     </div>
   </section>
-
-  <p class="foot">Elegís, pagás dentro de unos minutos y el turno queda confirmado.</p>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -192,9 +167,9 @@ input:focus{outline:2px solid var(--brand);border-color:transparent}
   var HOURS = ["09:00","10:00","11:00","12:00","15:00","16:00","17:00","18:00","19:00"];
   var DN = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
   var MN = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
-  var PRO = "Tu consultorio";
+  var PRO = "Tu negocio";
   var $ = function(id){return document.getElementById(id)};
-  var state = {day:null, slot:null, left:HOLD_SECONDS, timer:null, tick:null, phase:1, fakeHold:null};
+  var state = {day:null, slot:null, left:HOLD_SECONDS, tick:null, fakeHold:null};
   var booking = null;
 
   // Días: próximos 5 hábiles
@@ -209,7 +184,6 @@ input:focus{outline:2px solid var(--brand);border-color:transparent}
   function hash(s){var h=0;for(var i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))|0}return Math.abs(h)}
   function isBusy(di,h){return hash("x"+di+h)%100 < 38}
   function dayLabel(dt){return DN[dt.getDay()]+" "+dt.getDate()+" de "+MN[dt.getMonth()]}
-
   function toast(t){var el=$("toast");el.textContent=t;el.classList.add("show");setTimeout(function(){el.classList.remove("show")},2600)}
 
   function setSteps(n){
@@ -245,58 +219,41 @@ input:focus{outline:2px solid var(--brand);border-color:transparent}
   }
 
   function fmt(s){var m=Math.floor(s/60),x=s%60;return (m<10?"0":"")+m+":"+(x<10?"0":"")+x}
+  function paint(){$("clock").textContent=fmt(state.left)}
+  function stopClock(){clearInterval(state.tick)}
   function startClock(){
-    clearInterval(state.tick); state.left=HOLD_SECONDS; paint();
+    stopClock(); state.left=HOLD_SECONDS; paint();
     state.tick=setInterval(function(){
       state.left--; paint();
       if(state.left<=0){expire()}
     },1000);
   }
-  function paint(){$("clock").textContent=fmt(state.left);$("clock2").textContent=fmt(state.left)}
-  function stopClock(){clearInterval(state.tick)}
-
   function hold(h){
     state.slot=h;
     $("sumSlot").textContent=dayLabel(days[state.day])+" · "+h+" hs";
-    startClock(); setSteps(2); show("s2");
+    startClock(); setSteps(2); show("s2"); validate();
   }
-  function expire(){
-    stopClock(); state.slot=null; setSteps(1); show("s5");
-  }
-  function release(){
-    stopClock(); state.slot=null; setSteps(1); show("s1"); renderGrid();
-  }
+  function expire(){ stopClock(); state.slot=null; setSteps(1); show("s5"); }
+  function release(){ stopClock(); state.slot=null; setSteps(1); show("s1"); renderGrid(); }
 
   function validate(){
     var ok=$("nom").value.trim().length>1 && $("tel").value.replace(/\D/g,"").length>=8 && $("priv").checked;
-    $("goPay").disabled=!ok;
+    $("doPay").disabled=!ok;
   }
   ["nom","tel"].forEach(function(i){$(i).addEventListener("input",validate)});
   $("priv").addEventListener("change",validate);
-
-  $("goPay").onclick=function(){
-    // En el sistema real, acá el servidor revalida el horario y crea el link de pago
-    setSteps(3); show("s3");
-  };
   $("cancelHold").onclick=release;
   $("again").onclick=release;
   $("simExpire").onclick=function(){state.left=3;paint()};
 
-  document.querySelectorAll(".pay-opt").forEach(function(el){
-    el.onclick=function(){
-      document.querySelectorAll(".pay-opt").forEach(function(x){x.classList.remove("sel")});
-      el.classList.add("sel");
-    };
-  });
-
-  // ---- Confirmación: WhatsApp, descarga, calendario ----
+  // ---- Tu turno: WhatsApp, descarga, calendario ----
   function waNumber(raw){
     var n=raw.replace(/\D/g,"").replace(/^0+/,"");
     if(n.indexOf("54")===0) return n;
     return "549"+n;
   }
   function ticketText(b){
-    return "Turno confirmado ✓\n"+PRO+"\n"+b.dia+" · "+b.hora+" hs\nPaciente: "+b.nom+"\nEstado: Pagado";
+    return "Turno confirmado ✓\n"+PRO+"\n"+b.dia+" · "+b.hora+" hs\nCliente: "+b.nom+"\nEstado: Pagado";
   }
   function saveBlob(blob,name){
     var a=document.createElement("a");
@@ -314,7 +271,7 @@ input:focus{outline:2px solid var(--brand);border-color:transparent}
     x.fillText("Turno confirmado ✓",400,92);
     x.fillStyle="#ffffff";x.fillRect(60,200,680,520);
     x.strokeStyle="#b9d4cc";x.lineWidth=3;x.setLineDash([12,8]);x.strokeRect(60,200,680,520);x.setLineDash([]);
-    var rows=[["Paciente",b.nom],["Día",b.dia],["Hora",b.hora+" hs"],["Lugar",PRO],["Estado","Pagado ✓"]];
+    var rows=[["Cliente",b.nom],["Día",b.dia],["Hora",b.hora+" hs"],["Lugar",PRO],["Estado","Pagado ✓"]];
     rows.forEach(function(r,i){
       var y=290+i*95;
       x.textAlign="left";x.fillStyle="#6b7c77";x.font="30px system-ui,Arial,sans-serif";x.fillText(r[0],100,y);
@@ -346,8 +303,8 @@ input:focus{outline:2px solid var(--brand);border-color:transparent}
   $("btnCal").onclick=function(){ if(booking) downloadIcs() };
 
   $("doPay").onclick=function(){
-    $("payBox").classList.add("hidden"); $("procBox").classList.remove("hidden");
-    stopClock();
+    // En el sistema real, acá el servidor revalida el horario y abre el checkout de Mercado Pago
+    stopClock(); setSteps(2); show("s3");
     setTimeout(function(){
       var nom=$("nom").value.trim();
       var mail=$("mail").value.trim();
@@ -356,20 +313,18 @@ input:focus{outline:2px solid var(--brand);border-color:transparent}
       $("tDia").textContent=booking.dia;
       $("tHora").textContent=booking.hora+" hs";
       $("mailNote").textContent = mail ? "También te llegó el turno por mail a "+mail+"." : "";
-      $("notifTxt").innerHTML="<b>"+nom.replace(/</g,"&lt;")+"</b> reservó y pagó la seña.<br>"+booking.dia+", "+booking.hora+" hs · $ 12.000 acreditados.";
-      setSteps(4); show("s4");
-    },1800);
+      $("notifTxt").innerHTML="<b>"+nom.replace(/</g,"&lt;")+"</b> reservó y pagó la seña.<br>"+booking.dia+", "+booking.hora+" hs · $ 12.000 acreditados. Horario bloqueado en la agenda.";
+      setSteps(3); show("s4");
+    },1600);
   };
 
   $("restart").onclick=function(){
-    $("nom").value="";$("tel").value="";$("mail").value="";$("priv").checked=false;validate();
-    $("payBox").classList.remove("hidden");$("procBox").classList.add("hidden");
+    $("nom").value="";$("tel").value="";$("mail").value="";$("priv").checked=false;
     booking=null;state.slot=null;setSteps(1);show("s1");renderGrid();
   };
 
   // Simula que otra persona está pagando un horario (para mostrar la actualización en vivo)
   setTimeout(function(){
-    if(state.phase!==1) return;
     for(var i=0;i<HOURS.length;i++){
       if(!isBusy(state.day,HOURS[i]) && HOURS[i]!==state.slot){
         state.fakeHold={day:state.day,h:HOURS[i]};
