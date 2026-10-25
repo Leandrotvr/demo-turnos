@@ -159,6 +159,9 @@ window.lmDias=function(t){var N=["dom","lun","mar","mie","jue","vie","sab"];t=St
 (function(){
   var CFG = window.LMPrueba ? LMPrueba.load("turnos") : null;
   var mny = function(n){return "$ "+Number(n).toLocaleString("es-AR");};
+  var CU = window.LMPrueba ? LMPrueba.cuenta : null;
+  var REAL = !!(CU && CU.producto === "turnos" && CU.estado === "activo");
+  var OCUP = {};
   var SENA = CFG ? CFG.sena : 1000;
   var HOLD_SECONDS = 900;
   var HOURS = CFG ? CFG.horarios : ["09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00"];
@@ -181,8 +184,9 @@ window.lmDias=function(t){var N=["dom","lun","mar","mie","jue","vie","sab"];t=St
   state.day = 0;
 
   function pad(n){return (n<10?"0":"")+n}
+  function isoD(dt){return dt.getFullYear()+"-"+pad(dt.getMonth()+1)+"-"+pad(dt.getDate())}
   function hash(s){var h=0;for(var i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))|0}return Math.abs(h)}
-  function isBusy(di,h){return hash("x"+di+h)%100 < 38}
+  function isBusy(di,h){if(REAL)return !!OCUP[isoD(days[di])+"|"+h];return hash("x"+di+h)%100 < 38}
   function dayLabel(dt){return DN[dt.getDay()]+" "+dt.getDate()+" de "+MN[dt.getMonth()]}
   function toast(t){var el=$("toast");el.textContent=t;el.classList.add("show");setTimeout(function(){el.classList.remove("show")},3200)}
 
@@ -255,7 +259,7 @@ window.lmDias=function(t){var N=["dom","lun","mar","mie","jue","vie","sab"];t=St
     return "549"+n;
   }
   function ticketText(b){
-    return "Turno confirmado ✓\n"+PRO+"\n"+b.dia+" · "+b.hora+" hs\nCliente: "+b.nom+"\nEstado: Pagado";
+    return "Turno "+(REAL?"reservado":"confirmado")+" ✓\n"+PRO+"\n"+b.dia+" · "+b.hora+" hs\nCliente: "+b.nom+"\nEstado: "+(REAL?"Seña pendiente":"Pagado");
   }
   function saveBlob(blob,name){
     var a=document.createElement("a");
@@ -310,8 +314,8 @@ window.lmDias=function(t){var N=["dom","lun","mar","mie","jue","vie","sab"];t=St
     x.fillStyle="#6b7c77";x.font="bold 20px "+FONT;
     x.fillText("CLIENTE",64,432);x.fillText("ESTADO",520,432);
     x.fillStyle="#1f2d2a";x.font="bold 38px "+FONT;x.fillText(cut(b.nom,16),64,478);
-    x.fillStyle="#2f7d6d";x.fillText("Pagado ✓",520,478);
-    x.fillStyle="#9aa8a3";x.font="18px "+FONT;x.fillText(CFG?"Versión de prueba · leandrotvr.github.io":"Demo · datos ficticios",64,518);
+    x.fillStyle="#2f7d6d";x.fillText((REAL?"Reservado ✓":"Pagado ✓"),520,478);
+    x.fillStyle="#9aa8a3";x.font="18px "+FONT;x.fillText(REAL?"":(CFG?"Versión de prueba · leandrotvr.github.io":"Demo · datos ficticios"),64,518);
 
     // talón
     x.textAlign="center";x.fillStyle="#ffffff";
@@ -325,7 +329,7 @@ window.lmDias=function(t){var N=["dom","lun","mar","mie","jue","vie","sab"];t=St
       var g=2+((seed>>>16)%3);
       x.fillRect(px,by,w,bh);px+=w+g;
     }
-    x.font="bold 30px "+FONT;x.fillText("Pagado ✓",cx,470);
+    x.font="bold 30px "+FONT;x.fillText((REAL?"Reservado ✓":"Pagado ✓"),cx,470);
     return c;
   }
 
@@ -386,9 +390,8 @@ window.lmDias=function(t){var N=["dom","lun","mar","mie","jue","vie","sab"];t=St
   $("btnCal").onclick=function(){ if(booking) downloadIcs() };
 
   $("doPay").onclick=function(){
-    // En el sistema real, acá el servidor revalida el horario y abre el checkout de Mercado Pago
     stopClock(); setSteps(2); show("s3");
-    setTimeout(function(){
+    var finalizar=function(){
       var nom=$("nom").value.trim();
       var mail=$("mail").value.trim();
       booking={nom:nom,tel:$("tel").value,mail:mail,date:days[state.day],hora:state.slot,dia:dayLabel(days[state.day])};
@@ -397,9 +400,17 @@ window.lmDias=function(t){var N=["dom","lun","mar","mie","jue","vie","sab"];t=St
       $("ticketImg").src=ticketCanvas.toDataURL("image/png");
       $("ticketImg").alt="Turno confirmado: "+booking.dia+", "+booking.hora+" hs, a nombre de "+nom;
       $("mailNote").textContent = mail ? "También te llegó el turno por mail a "+mail+"." : "";
-      $("notifTxt").innerHTML="<b>"+nom.replace(/</g,"&lt;")+"</b> reservó y pagó la seña.<br>"+booking.dia+", "+booking.hora+" hs · "+mny(SENA)+" acreditados. Horario bloqueado en la agenda.";
+      if(!REAL)$("notifTxt").innerHTML="<b>"+nom.replace(/</g,"&lt;")+"</b> reservó y pagó la seña.<br>"+booking.dia+", "+booking.hora+" hs · "+mny(SENA)+" acreditados. Horario bloqueado en la agenda.";
+      if(REAL){var cb=(CFG&&CFG.cobro)||"";var lk=/^https?:\/\//.test(cb)?'<a href="'+cb.replace(/"/g,"")+'" target="_blank" rel="noopener">'+cb.replace(/</g,"&lt;")+"</a>":cb.replace(/</g,"&lt;");
+        $("notifTxt").innerHTML=cb?"Abonar la seña de <b>"+mny(SENA)+"</b>: "+lk+".<br>Después avisá al negocio por WhatsApp.":"El negocio te va a confirmar el turno por WhatsApp."}
       setSteps(3); show("s4");
-    },1600);
+    };
+    if(REAL){
+      LMPrueba.rpc("lm_reservar",{p_codigo:CU.codigo,p_fecha:isoD(days[state.day]),p_hora:state.slot,p_nombre:$("nom").value.trim(),p_tel:$("tel").value.trim()}).then(finalizar).catch(function(e){
+        if(/horario_ocupado/.test(e.message)){OCUP[isoD(days[state.day])+"|"+state.slot]=1;toast("Ese horario se acaba de ocupar. Elegí otro.");release()}
+        else{toast("No se pudo reservar. Probá de nuevo.");setSteps(2);show("s2")}
+      });
+    } else setTimeout(finalizar,1600);
   };
 
   $("restart").onclick=function(){
@@ -409,6 +420,7 @@ window.lmDias=function(t){var N=["dom","lun","mar","mie","jue","vie","sab"];t=St
 
   // Simula que otra persona está pagando un horario (para mostrar la actualización en vivo)
   setTimeout(function(){
+    if(REAL)return;
     for(var i=0;i<HOURS.length;i++){
       if(!isBusy(state.day,HOURS[i]) && HOURS[i]!==state.slot){
         state.fakeHold={day:state.day,h:HOURS[i]};
@@ -420,12 +432,25 @@ window.lmDias=function(t){var N=["dom","lun","mar","mie","jue","vie","sab"];t=St
   },6000);
 
   renderDays();renderGrid();setSteps(1);
+  if(REAL){LMPrueba.rpc("lm_ocupados",{p_codigo:CU.codigo}).then(function(a){a.forEach(function(k){OCUP[k]=1});renderGrid()}).catch(function(){})}
   $("senaTxt").textContent=mny(SENA);
   $("doPay").textContent="Pagar "+mny(SENA);
   if(CFG){
     document.querySelector("h1").textContent=PRO;
     document.querySelector(".avatar").textContent=PRO.split(/\s+/).map(function(w){return w.charAt(0)}).join("").slice(0,2).toUpperCase();
     document.querySelector(".demo-bar").innerHTML="<b>VERSIÓN DE PRUEBA</b> · Con los datos de tu negocio · El pago es simulado";
+  }
+  if(REAL){
+    var stl=document.createElement("style");stl.textContent=".lm-nav,.demo-bar,.tools,.timer{display:none!important}";document.head.appendChild(stl);
+    $("doPay").textContent="Reservar turno";
+    document.querySelector("#s2 h2").textContent="Confirmá tu reserva";
+    document.querySelector("#s2 .mp").textContent=CFG&&CFG.cobro?"La seña se abona al terminar: te mostramos cómo.":"El negocio te confirma el turno por WhatsApp.";
+    document.querySelector(".notif small").textContent="Para confirmar tu turno";
+    document.querySelector("#s4 h2").textContent="¡Turno reservado!";
+    $("restart").textContent="Sacar otro turno";
+    $("btnWa").textContent="Avisar al negocio por WhatsApp";
+    if(!(CFG&&CFG.whatsapp))$("btnWa").style.display="none";
+    $("btnWa").onclick=function(){if(!booking)return;window.open("https://wa.me/"+waNumber(CFG.whatsapp)+"?text="+encodeURIComponent("Hola! Reservé un turno en "+PRO+": "+booking.dia+", "+booking.hora+" hs. Nombre: "+booking.nom+"."),"_blank")};
   }
 })();
 </script>
@@ -434,6 +459,8 @@ if(window.LMPrueba)LMPrueba.mount({key:"turnos",cosa:"negocio",title:"Mis turnos
 fields:[{id:"nombre",label:"Nombre de tu negocio",req:1,placeholder:"Ej.: Peluquería Mariana"},
 {id:"dias",label:"Días que atendés",def:"lun a vie",placeholder:"lun a vie",hint:"Ej.: lun a sáb, o lun, mié, vie."},
 {id:"color",label:"Color de tu marca",type:"color",def:"#0B7A63"},
+{id:"whatsapp",label:"Tu WhatsApp (te avisan acá los turnos)",type:"tel",placeholder:"Ej.: 3777 123456",hint:"Con código de área, sin 0 ni 15."},
+{id:"cobro",label:"Cómo cobrás la seña",placeholder:"Link de Mercado Pago o alias",hint:"Se lo mostramos a tu cliente al reservar. Opcional."},
 {id:"sena",label:"Seña a cobrar ($)",type:"number",def:1000,hint:"Es el monto que ve tu cliente al reservar."},
 {id:"horarios",label:"Tus horarios",type:"list",req:1,max:6,placeholder:"09:00\n10:30\n16:00",hint:"Un horario por línea, formato 24 hs (ej.: 09:30)."}],
 check:function(v){if(!lmDias(v.dias).length)return"Revisá los días: escribí por ejemplo «lun a vie».";var out=[];for(var i=0;i<v.horarios.length;i++){var m=/^(\d{1,2})[:.](\d{2})$/.exec(v.horarios[i]);if(!m||+m[1]>23||+m[2]>59)return"Revisá el horario «"+v.horarios[i]+"»: usá el formato 09:30.";out.push((m[1].length<2?"0":"")+m[1]+":"+m[2])}
