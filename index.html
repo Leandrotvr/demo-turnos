@@ -101,7 +101,7 @@ details summary{cursor:pointer;padding:4px 0}
     <div class="card">
       <h2>Pagá para confirmar</h2>
       <div class="sum"><span>Turno</span><b id="sumSlot"></b></div>
-      <div class="sum"><span>Seña</span><b>$ 12.000</b></div>
+      <div class="sum"><span>Seña</span><b id="senaTxt">$ 12.000</b></div>
       <label for="nom">Nombre</label>
       <input type="text" id="nom" placeholder="Ej: Ana" autocomplete="off">
       <label for="tel">WhatsApp</label>
@@ -151,13 +151,17 @@ details summary{cursor:pointer;padding:4px 0}
 </div>
 <div class="toast" id="toast"></div>
 
+<script src="https://leandrotvr.github.io/prueba.js"></script>
 <script>
 (function(){
+  var CFG = window.LMPrueba ? LMPrueba.load("turnos") : null;
+  var mny = function(n){return "$ "+Number(n).toLocaleString("es-AR");};
+  var SENA = CFG ? CFG.sena : 12000;
   var HOLD_SECONDS = 600;
-  var HOURS = ["09:00","10:00","11:00","12:00","15:00","16:00","17:00","18:00","19:00"];
+  var HOURS = CFG ? CFG.horarios : ["09:00","10:00","11:00","12:00","15:00","16:00","17:00","18:00","19:00"];
   var DN = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
   var MN = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
-  var PRO = "Tu negocio";
+  var PRO = CFG ? CFG.nombre : "Tu negocio";
   var FONT = "system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif";
   var $ = function(id){return document.getElementById(id)};
   var state = {day:null, slot:null, left:HOLD_SECONDS, tick:null, fakeHold:null};
@@ -300,7 +304,7 @@ details summary{cursor:pointer;padding:4px 0}
     x.fillText("CLIENTE",64,432);x.fillText("ESTADO",520,432);
     x.fillStyle="#1f2d2a";x.font="bold 38px "+FONT;x.fillText(cut(b.nom,16),64,478);
     x.fillStyle="#2f7d6d";x.fillText("Pagado ✓",520,478);
-    x.fillStyle="#9aa8a3";x.font="18px "+FONT;x.fillText("Demo · datos ficticios",64,518);
+    x.fillStyle="#9aa8a3";x.font="18px "+FONT;x.fillText(CFG?"Versión de prueba · leandrotvr.github.io":"Demo · datos ficticios",64,518);
 
     // talón
     x.textAlign="center";x.fillStyle="#ffffff";
@@ -386,7 +390,7 @@ details summary{cursor:pointer;padding:4px 0}
       $("ticketImg").src=ticketCanvas.toDataURL("image/png");
       $("ticketImg").alt="Turno confirmado: "+booking.dia+", "+booking.hora+" hs, a nombre de "+nom;
       $("mailNote").textContent = mail ? "También te llegó el turno por mail a "+mail+"." : "";
-      $("notifTxt").innerHTML="<b>"+nom.replace(/</g,"&lt;")+"</b> reservó y pagó la seña.<br>"+booking.dia+", "+booking.hora+" hs · $ 12.000 acreditados. Horario bloqueado en la agenda.";
+      $("notifTxt").innerHTML="<b>"+nom.replace(/</g,"&lt;")+"</b> reservó y pagó la seña.<br>"+booking.dia+", "+booking.hora+" hs · "+mny(SENA)+" acreditados. Horario bloqueado en la agenda.";
       setSteps(3); show("s4");
     },1600);
   };
@@ -409,7 +413,22 @@ details summary{cursor:pointer;padding:4px 0}
   },6000);
 
   renderDays();renderGrid();setSteps(1);
+  if(CFG){
+    document.querySelector("h1").textContent=PRO;
+    document.querySelector(".avatar").textContent=PRO.split(/\s+/).map(function(w){return w.charAt(0)}).join("").slice(0,2).toUpperCase();
+    $("senaTxt").textContent=mny(SENA);
+    $("doPay").textContent="Pagar "+mny(SENA);
+    document.querySelector(".demo-bar").innerHTML="<b>VERSIÓN DE PRUEBA</b> · Con los datos de tu negocio · El pago es simulado";
+  }
 })();
+</script>
+<script>
+if(window.LMPrueba)LMPrueba.mount({key:"turnos",cosa:"negocio",title:"Mis turnos de prueba",intro:"Cargá tu negocio y mirá cómo reserva tu cliente.",limit:"hasta 6 horarios por día y pago simulado",
+fields:[{id:"nombre",label:"Nombre de tu negocio",req:1,placeholder:"Ej.: Peluquería Mariana"},
+{id:"sena",label:"Seña a cobrar ($)",type:"number",def:12000,hint:"Es el monto que ve tu cliente al reservar."},
+{id:"horarios",label:"Tus horarios",type:"list",req:1,max:6,placeholder:"09:00\n10:30\n16:00",hint:"Un horario por línea, formato 24 hs (ej.: 09:30)."}],
+check:function(v){var out=[];for(var i=0;i<v.horarios.length;i++){var m=/^(\d{1,2})[:.](\d{2})$/.exec(v.horarios[i]);if(!m||+m[1]>23||+m[2]>59)return"Revisá el horario «"+v.horarios[i]+"»: usá el formato 09:30.";out.push((m[1].length<2?"0":"")+m[1]+":"+m[2])}
+out.sort();v.horarios=out;if(!(v.sena>0))return"La seña tiene que ser mayor a cero.";return""}});
 </script>
 <script src="https://leandrotvr.github.io/nav.js" defer></script>
 </body>
