@@ -153,6 +153,9 @@ details summary{cursor:pointer;padding:4px 0}
 
 <script src="https://leandrotvr.github.io/prueba.js"></script>
 <script>
+window.lmDias=function(t){var N=["dom","lun","mar","mie","jue","vie","sab"];t=String(t||"lun a vie").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");var ids=(t.match(/(dom|lun|mar|mie|jue|vie|sab)[a-z]*/g)||[]).map(function(x){return N.indexOf(x.slice(0,3))});var set=[];if(ids.length===2&&/(\ba\b|-)/.test(t)){var i=ids[0];for(var k=0;k<7;k++){set.push(i);if(i===ids[1])break;i=(i+1)%7}}else set=ids;return set};
+</script>
+<script>
 (function(){
   var CFG = window.LMPrueba ? LMPrueba.load("turnos") : null;
   var mny = function(n){return "$ "+Number(n).toLocaleString("es-AR");};
@@ -162,6 +165,8 @@ details summary{cursor:pointer;padding:4px 0}
   var DN = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
   var MN = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
   var PRO = CFG ? CFG.nombre : "Tu consultorio";
+  var DIAS = CFG ? lmDias(CFG.dias) : [1,2,3,4,5];
+  if(CFG && CFG.color) document.documentElement.style.setProperty("--brand",CFG.color);
   var FONT = "system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif";
   var $ = function(id){return document.getElementById(id)};
   var state = {day:null, slot:null, left:HOLD_SECONDS, tick:null, fakeHold:null};
@@ -170,7 +175,7 @@ details summary{cursor:pointer;padding:4px 0}
   // Días: próximos 14 hábiles, empezando hoy (igual que el sistema real)
   var days = [], d = new Date();
   while(days.length < 14){
-    if(d.getDay() !== 0 && d.getDay() !== 6) days.push(new Date(d.getTime()));
+    if(DIAS.indexOf(d.getDay()) >= 0) days.push(new Date(d.getTime()));
     d = new Date(d.getTime() + 86400000);
   }
   state.day = 0;
@@ -427,9 +432,11 @@ details summary{cursor:pointer;padding:4px 0}
 <script>
 if(window.LMPrueba)LMPrueba.mount({key:"turnos",cosa:"negocio",title:"Mis turnos de prueba",intro:"Cargá tu negocio y mirá cómo reserva tu cliente.",limit:"hasta 6 horarios por día y pago simulado",
 fields:[{id:"nombre",label:"Nombre de tu negocio",req:1,placeholder:"Ej.: Peluquería Mariana"},
+{id:"dias",label:"Días que atendés",def:"lun a vie",placeholder:"lun a vie",hint:"Ej.: lun a sáb, o lun, mié, vie."},
+{id:"color",label:"Color de tu marca",type:"color",def:"#0B7A63"},
 {id:"sena",label:"Seña a cobrar ($)",type:"number",def:1000,hint:"Es el monto que ve tu cliente al reservar."},
 {id:"horarios",label:"Tus horarios",type:"list",req:1,max:6,placeholder:"09:00\n10:30\n16:00",hint:"Un horario por línea, formato 24 hs (ej.: 09:30)."}],
-check:function(v){var out=[];for(var i=0;i<v.horarios.length;i++){var m=/^(\d{1,2})[:.](\d{2})$/.exec(v.horarios[i]);if(!m||+m[1]>23||+m[2]>59)return"Revisá el horario «"+v.horarios[i]+"»: usá el formato 09:30.";out.push((m[1].length<2?"0":"")+m[1]+":"+m[2])}
+check:function(v){if(!lmDias(v.dias).length)return"Revisá los días: escribí por ejemplo «lun a vie».";var out=[];for(var i=0;i<v.horarios.length;i++){var m=/^(\d{1,2})[:.](\d{2})$/.exec(v.horarios[i]);if(!m||+m[1]>23||+m[2]>59)return"Revisá el horario «"+v.horarios[i]+"»: usá el formato 09:30.";out.push((m[1].length<2?"0":"")+m[1]+":"+m[2])}
 out.sort();v.horarios=out;if(!(v.sena>0))return"La seña tiene que ser mayor a cero.";return""}});
 </script>
 <script src="https://leandrotvr.github.io/nav.js" defer></script>
